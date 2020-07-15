@@ -2,9 +2,10 @@ package models;
 
 import java.util.ArrayList;
 
-public class User {
+public class Standard {
 	
 	private long id;
+	private String role = "standard";
 	private String firstName;
 	private String lastName;
 	private String userName;
@@ -16,11 +17,11 @@ public class User {
 	
 	
 	
-	public User() {
+	public Standard() {
 		
 	}
 
-	public User(long id, String firstName, String lastName, String userName, String password, String email,
+	public Standard(long id, String firstName, String lastName, String userName, String password, String email,
 			String phoneNumber, String address) {
 		super();
 		this.id = id;
@@ -40,6 +41,15 @@ public class User {
 		account.setUserIDNumber(this.id);
 		accounts.add(account);
 		return account;
+	}
+	
+	public String getRole() {
+		return this.role;
+	}
+
+
+	public void setAccounts(ArrayList<Account> accounts) {
+		this.accounts = accounts;
 	}
 	
 	public ArrayList<Account> getAccounts() {
