@@ -4,8 +4,6 @@ import java.util.*;
 
 import models.Account;
 
-
-
 public interface AccountDAO {
 
 	public boolean insert(Account account);

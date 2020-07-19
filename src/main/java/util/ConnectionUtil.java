@@ -5,6 +5,13 @@ public class ConnectionUtil {
 
 	public static Connection getConnection() throws SQLException {
 		
+		try {
+			//Lets Tomcat see where the driver is
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 		String url = "jdbc:postgresql://localhost:5432/bank";
 		String username = "postgres";
 		String password = ""; 

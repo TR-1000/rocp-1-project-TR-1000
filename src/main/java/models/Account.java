@@ -3,8 +3,8 @@ package models;
 public class Account {
 
 	private long accountNumber;
-	private double balance;
 	private long userIDNumber;
+	private double balance;
 	//private AccountStatus status;
 	//private AccountType type;
 	
@@ -66,6 +66,7 @@ public class Account {
 	}
 	
 	public void transfer(Account toAccount, double amount) {
+		System.out.println("Current balance: " + balance);
 		System.out.println("Attempting transfer of "+ amount);
 		if(amount <= balance) {
 			this.withdrawal(amount);
