@@ -24,9 +24,9 @@ public class AccountDAOImpl implements AccountDAO {
 			
 			System.out.println("Adding account to database");
 			
-			if(statement.execute()) {
-				return true;
-			}
+			statement.execute();
+			return true;
+			
 	
 		}catch (SQLException e) {
 			System.out.println(e);
@@ -42,7 +42,7 @@ public class AccountDAOImpl implements AccountDAO {
 	public Set<Account> selectAllAccounts() {
 		System.out.println("Finding all accounts");
 		try(Connection conn = ConnectionUtil.getConnection()) {
-			String sql = "SELECT * FROM customers;";
+			String sql = "SELECT * FROM accounts;";
 			
 			Statement statement = conn.createStatement();
 			
@@ -52,9 +52,12 @@ public class AccountDAOImpl implements AccountDAO {
 			
 			while(result.next()) {
 				accountSet.add(new Account(
+						result.getLong("account_number"),
 						result.getLong("customer_id"),
 						result.getDouble("balance"),
-						result.getString("type"))
+						result.getString("type"),
+						result.getString("status")
+						)
 					);	
 			}
 			

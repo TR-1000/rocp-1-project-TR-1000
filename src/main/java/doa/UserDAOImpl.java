@@ -75,7 +75,6 @@ public class UserDAOImpl implements UserDAO {
 	
 
 	
-	
 	@Override
 	public Set<User> findAllCustomers() {
 		System.out.println("Finding all users");

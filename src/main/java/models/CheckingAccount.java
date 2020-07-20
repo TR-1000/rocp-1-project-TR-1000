@@ -2,6 +2,7 @@ package models;
 
 public class CheckingAccount extends Account {
 	private String type = "checking";
+	private String status;
 
 	public CheckingAccount() {
 		super();
@@ -28,6 +29,15 @@ public class CheckingAccount extends Account {
 		this.type = type;
 	}
 	
+	@Override
+	public String getStatus() {
+		return status;
+	}
+
+	@Override
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	
 	
 	

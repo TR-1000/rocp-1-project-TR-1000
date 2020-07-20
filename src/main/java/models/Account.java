@@ -15,6 +15,17 @@ public class Account {
 		
 	}
 	
+	
+	public Account(long accountNumber, long userIDNumber,
+			double balance, String type, String status) {
+		super();
+		this.accountNumber = accountNumber;
+		this.userIDNumber = userIDNumber;
+		this.balance = balance;
+		this.type = type;
+		this.status = status;
+	}
+
 	public Account(long userIDNumber){
 		this.userIDNumber = userIDNumber;
 		System.out.println("Account created! Account number is " + this.userIDNumber);
@@ -56,6 +67,8 @@ public class Account {
 		this.balance = balance;
 		this.type = type;
 	}
+
+	
 
 	public long getUserIDNumber() {
 		System.out.println("User ID Number: " + userIDNumber);

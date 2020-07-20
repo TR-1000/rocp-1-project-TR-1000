@@ -16,14 +16,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 import controllers.UserController;
+import doa.AccountDAO;
+import doa.AccountDAOImpl;
+import models.Account;
 import models.Admin;
 import models.Employee;
 import models.User;
+
+
 
 public class MasterServlet extends HttpServlet {
 	
 	private static final ObjectMapper om = new ObjectMapper();
 	private static final UserController userController = new UserController();
+	private static final AccountDAO accountDAO = new AccountDAOImpl();
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -42,6 +48,7 @@ public class MasterServlet extends HttpServlet {
 		System.out.println(Arrays.toString(portions));
 
 		try {
+			System.out.println("try");
 			switch (portions[0]) {
 			case "users":
 				if (portions.length == 2) {
@@ -53,6 +60,7 @@ public class MasterServlet extends HttpServlet {
 					res.getWriter().println(json);
 				} else {
 					if (req.getMethod().equals("POST")) {
+						System.out.println("POST method");
 						BufferedReader reader = req.getReader();
 
 						StringBuilder string = new StringBuilder();
@@ -69,7 +77,6 @@ public class MasterServlet extends HttpServlet {
 						System.out.println(body);
 						
 						User user = om.readValue(body, User.class);
-						//Avenger a = om.readValue(body, Avenger.class);
 						
 						System.out.println(user);
 
@@ -87,95 +94,10 @@ public class MasterServlet extends HttpServlet {
 					}
 						
 				}
-			break;	
+				break;
 				
-			case "employees":
-				if (portions.length == 2) {
-					int id = Integer.parseInt(portions[1]);
-					Set<Employee> emp = userController.findEmployeeByID(id);
-					res.setStatus(200);
-					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
-					String json = om.writeValueAsString(emp);
-					res.getWriter().println(json);
-				} else {
-					if (req.getMethod().equals("POST")) {
-						BufferedReader reader = req.getReader();
-
-						StringBuilder string = new StringBuilder();
-
-						String line = reader.readLine();
-
-						while (line != null) {
-							string.append(line);
-							line = reader.readLine();
-						}
-
-						String body = new String(string);
-
-						System.out.println(body);
-						
-						User user = om.readValue(body, User.class);
-						//Avenger a = om.readValue(body, Avenger.class);
-						
-						System.out.println(user);
-
-//						if (userController.addUser(user)) {
-//							System.out.println("in addAvenger if statement");
-//							res.setStatus(201);
-//							res.getWriter().println("Avenger was created");
-//						}
-					
-						
-					} else {
-
-						Set<User> all = userController.findAllEmployees();
-						res.setStatus(200);
-						res.getWriter().println(om.writeValueAsString(all));
-					}
-					
-				
-					
-				}
-			break;	
-				
-			case "admin":
-				Set<Admin> all = userController.findAllAdmins();
-				res.setStatus(200);
-				res.getWriter().println(om.writeValueAsString(all));
-				
-			}
-			
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			res.getWriter().println("The id you provided is not an integer");
-			res.setStatus(400);
-		}
-
-	}
-
-		
-		
-
-
-
-	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-res.setContentType("application/json");
-		
-		// this will set the default response to not found;
-		// the request was successful
-		res.setStatus(404);
-		
-		final String URI = req.getRequestURI().replace("/rocp-project/", "");
-
-		String[] portions = URI.split("/");
-
-		System.out.println(Arrays.toString(portions));
-		
-		System.out.println("Updating user");
-
-		try {
-			switch (portions[0]) {
 			case "UpdateUser":
+				if (req.getMethod().equals("POST")) {
 				System.out.println("Updating user");
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
@@ -223,21 +145,42 @@ res.setContentType("application/json");
 					String json = om.writeValueAsString(foundUser);
 					res.getWriter().println(json);
 						
-				} 
-			break;	
+				}
+			}	
+			break;		
 				
 			case "employees":
 				if (portions.length == 2) {
-					int user_id = Integer.parseInt(portions[1]);
-					Set<Employee> emp = userController.findEmployeeByID(user_id);
+					int id = Integer.parseInt(portions[1]);
+					Set<Employee> emp = userController.findEmployeeByID(id);
 					res.setStatus(200);
 					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
 					String json = om.writeValueAsString(emp);
 					res.getWriter().println(json);
 				} else {
-					
+					Set<User> all = userController.findAllEmployees();
+					res.setStatus(200);
+					res.getWriter().println(om.writeValueAsString(all));
+				}
+				break;	
+				
+			case "admin":
+				Set<Admin> all = userController.findAllAdmins();
+				res.setStatus(200);
+				res.getWriter().println(om.writeValueAsString(all));
+				break;
+				
+			case "accounts":
+				if (portions.length == 2) {
+					int id = Integer.parseInt(portions[1]);
+					Account account = accountDAO.getAccountById(id);
+					res.setStatus(200);
+					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
+					String json = om.writeValueAsString(account);
+					res.getWriter().println(json);
+				} else {
 					if (req.getMethod().equals("POST")) {
-						
+						System.out.println("POST Method");
 						BufferedReader reader = req.getReader();
 
 						StringBuilder string = new StringBuilder();
@@ -253,25 +196,35 @@ res.setContentType("application/json");
 
 						System.out.println(body);
 						
-						User user = om.readValue(body, User.class);
+						Account account = om.readValue(body, Account.class);
 						
-						System.out.println(user);
-
+						System.out.println(account);
 						
+						int customer_id = (int) account.getUserIDNumber();
+						
+						User foundUser = userController.findCustomerByID(customer_id);
+						// If customer is not found in the database
+						if(foundUser == null) {
+							res.setStatus(404);
+							res.getWriter().println("customer ID number " + customer_id + " doesn't exist");
+						
+						// If customer is found in the database
+						} else {
+							if (accountDAO.addAccount(account)) {
+								res.setStatus(201);
+								res.getWriter().println("Account was created");
+								
+							} 
+						}
+						
+					
 					} else {
-
-						Set<User> all = userController.findAllEmployees();
+						Set<Account> allAccounts = accountDAO.selectAllAccounts();
 						res.setStatus(200);
-						res.getWriter().println(om.writeValueAsString(all));
+						res.getWriter().println(om.writeValueAsString(allAccounts));
 					}
-						
+					
 				}
-			break;	
-				
-			case "admin":
-				Set<Admin> all = userController.findAllAdmins();
-				res.setStatus(200);
-				res.getWriter().println(om.writeValueAsString(all));
 				
 			}
 			
@@ -280,7 +233,89 @@ res.setContentType("application/json");
 			res.getWriter().println("The id you provided is not an integer");
 			res.setStatus(400);
 		}
+
 	}
+
+		
+		
+
+
+
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		doGet(req, res);
+		
+//		res.setContentType("application/json");
+//		// this will set the default response to not found;
+//		// the request was successful
+//		res.setStatus(404);
+//				
+//		final String URI = req.getRequestURI().replace("/rocp-project/", "");
+//
+//		String[] portions = URI.split("/");
+//
+//		System.out.println(Arrays.toString(portions));
+//		
+//		try {
+//			switch (portions[0]) {
+			
+//				
+//			case "employees":
+//				if (portions.length == 2) {
+//					int user_id = Integer.parseInt(portions[1]);
+//					Set<Employee> emp = userController.findEmployeeByID(user_id);
+//					res.setStatus(200);
+//					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
+//					String json = om.writeValueAsString(emp);
+//					res.getWriter().println(json);
+//				} else {
+//					
+//					if (req.getMethod().equals("POST")) {
+//						
+//						BufferedReader reader = req.getReader();
+//
+//						StringBuilder string = new StringBuilder();
+//
+//						String line = reader.readLine();
+//
+//						while (line != null) {
+//							string.append(line);
+//							line = reader.readLine();
+//						}
+//
+//						String body = new String(string);
+//
+//						System.out.println(body);
+//						
+//						User user = om.readValue(body, User.class);
+//						
+//						System.out.println(user);
+//
+//						
+//					} else {
+//
+//						Set<User> all = userController.findAllEmployees();
+//						res.setStatus(200);
+//						res.getWriter().println(om.writeValueAsString(all));
+//					}
+//						
+//				}
+//			break;	
+//				
+//			case "admin":
+//				Set<Admin> all = userController.findAllAdmins();
+//				res.setStatus(200);
+//				res.getWriter().println(om.writeValueAsString(all));
+//				
+//			}
+//			
+//		} catch (NumberFormatException e) {
+//			e.printStackTrace();
+//			res.getWriter().println("The id you provided is not an integer");
+//			res.setStatus(400);
+//		}
+				
+	}
+	
 }
 		
 		
