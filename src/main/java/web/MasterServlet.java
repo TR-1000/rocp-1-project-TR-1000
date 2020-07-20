@@ -50,6 +50,9 @@ public class MasterServlet extends HttpServlet {
 		try {
 			System.out.println("try");
 			switch (portions[0]) {
+			
+			
+			///////////////// USERS /////////////////
 			case "users":
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
@@ -96,6 +99,9 @@ public class MasterServlet extends HttpServlet {
 				}
 				break;
 				
+				
+				
+            ///////////////// UPDATE USERS /////////////////
 			case "UpdateUser":
 				if (req.getMethod().equals("POST")) {
 				System.out.println("Updating user");
@@ -147,8 +153,10 @@ public class MasterServlet extends HttpServlet {
 						
 				}
 			}	
-			break;		
-				
+				break;
+			
+			
+			///////////////// EMPLOYEES /////////////////
 			case "employees":
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
@@ -164,12 +172,18 @@ public class MasterServlet extends HttpServlet {
 				}
 				break;	
 				
+				
+				
+			///////////////// ADMIN /////////////////
 			case "admin":
 				Set<Admin> all = userController.findAllAdmins();
 				res.setStatus(200);
 				res.getWriter().println(om.writeValueAsString(all));
 				break;
 				
+				
+				
+			///////////////// ACCOUNTS /////////////////
 			case "accounts":
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
@@ -225,6 +239,62 @@ public class MasterServlet extends HttpServlet {
 					}
 					
 				}
+					break;
+					
+					
+					
+			///////////////// UPDATE ACCOUNTS /////////////////
+			case "accountupdate" :
+				if (req.getMethod().equals("POST")) {
+					if (portions.length == 2) {
+						System.out.println("Updating account status");
+						int id = Integer.parseInt(portions[1]);
+						Account foundAccount = accountDAO.getAccountById(id);
+						
+						BufferedReader reader = req.getReader();
+
+						StringBuilder string = new StringBuilder();
+
+						String line = reader.readLine();
+
+						while (line != null) {
+							string.append(line);
+							line = reader.readLine();
+						}
+
+						String body = new String(string);
+
+						System.out.println(body);
+						
+						Account account = om.readValue(body, Account.class);
+						
+						System.out.println(account);
+						
+						if(account != null) {
+							foundAccount.setStatus(account.getStatus());
+							foundAccount.setAccountNumber(id);
+
+							System.out.println("before " + foundAccount);
+							
+							accountDAO.updateAccountStatus(foundAccount);
+							
+							System.out.println("after " + foundAccount);
+							
+							accountDAO.updateAccountStatus(foundAccount);
+							
+							foundAccount = accountDAO.getAccountById(id);
+						
+							System.out.println(body);
+							
+						}
+						res.setStatus(200);
+						String json = om.writeValueAsString(foundAccount);
+						res.getWriter().println(json);
+							
+					}
+				}	
+					break;
+				
 				
 			}
 			

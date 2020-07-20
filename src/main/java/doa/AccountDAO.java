@@ -3,6 +3,7 @@ package doa;
 import java.util.*;
 
 import models.Account;
+import models.User;
 
 public interface AccountDAO {
 
@@ -15,6 +16,7 @@ public interface AccountDAO {
 	public boolean transfer(Account source, Account target, double amount);
 	public boolean deposit(Account account, double amount);
 	public boolean withdrawl(Account account, double amount);
+	public boolean updateAccountStatus(Account account);
 	
 	
 	

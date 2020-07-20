@@ -105,6 +105,7 @@ public class AccountDAOImpl implements AccountDAO {
 	public Set<Account> getsAccountsByUserID(int id) {
 		System.out.println("Finding all accounts");
 		try(Connection conn = ConnectionUtil.getConnection()) {
+			
 			String sql = "SELECT * FROM accounts WHERE customer_id = " + id + ";";
 			
 			Statement statement = conn.createStatement();
@@ -126,6 +127,29 @@ public class AccountDAOImpl implements AccountDAO {
 			System.out.println(e);
 		}
 		return null;
+	}
+	
+	
+	@Override
+	public boolean updateAccountStatus(Account account) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			String sql = "UPDATE accounts SET  status=? WHERE account_number = ?;";
+			
+			PreparedStatement statement = conn.prepareStatement(sql);
+			System.out.println(statement);
+			int index = 0;
+			
+			statement.setString(++index, account.getStatus());
+			statement.setInt(++index, (int) account.getAccountNumber());
+			
+			statement.execute();
+			return true;
+					
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 
