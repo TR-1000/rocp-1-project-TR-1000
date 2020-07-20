@@ -2,8 +2,11 @@ import doa.AccountDAO;
 import doa.AccountDAOImpl;
 import doa.UserDAO;
 import doa.UserDAOImpl;
+import models.Account;
 import models.Admin;
+import models.CheckingAccount;
 import models.Employee;
+import models.SavingsAccount;
 import models.User;
 
 public class BankApplication {
@@ -38,7 +41,7 @@ public class BankApplication {
 		UserDAO userDAO = new UserDAOImpl();
 		
 		User user1 = new User(
-				
+				1,
 				"john",
 				"deere",
 				"jj_deere",
@@ -48,7 +51,8 @@ public class BankApplication {
 			);
 		
 		
-		String user1Role = user1.getRole();
+		long user1id = user1.getId();
+		System.out.println(user1id);
 //		String empRole = emp.getRole();
 //		String adminRole = admin1.getRole();
 		
@@ -57,18 +61,26 @@ public class BankApplication {
 //		System.out.println(user1Role.equals("standard"));
 		
 //		userDAO.insert(user1);
-		userDAO.insert(emp);
-		userDAO.insert(admin1);
+//		userDAO.insert(emp);
+//		userDAO.insert(admin1);
 //		
 //		
 //		
 //		
 //		
-//		user1.createAccount(25);
+		user1.createCheckingAccount();
 //		admin1.createAccount(34);
-//		user1.createAccount(78);
+		user1.createSavingsAccount();
 //		emp.createAccount(90);
-//		
+		
+		
+		Account ca1 = user1.accounts.get(0);
+		Account sa1 = user1.accounts.get(1);
+		System.out.println(ca1.getType());
+		System.out.println(sa1.getType());
+		
+//		accountDAO.insert(ca1);
+//		accountDAO.insert(sa1);
 //	
 //		
 //		user1.accounts.get(0).deposit(1000.00);

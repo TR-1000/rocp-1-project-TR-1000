@@ -61,10 +61,19 @@ public class User {
 		System.out.println("New user created\nUser ID: " + id + "User Name: " + userName + "\n");
 	}
 
-	public Account createAccount(long accountNumber) {
-		Account account = new Account(accountNumber);
+	public CheckingAccount createCheckingAccount() {
+		CheckingAccount account = new CheckingAccount();
 		account.setUserIDNumber(this.id);
 		accounts.add(account);
+		System.out.println(accounts);
+		return account;
+	}
+	
+	public SavingsAccount createSavingsAccount() {
+		SavingsAccount account = new SavingsAccount();
+		account.setUserIDNumber(this.id);
+		accounts.add(account);
+		System.out.println(accounts);
 		return account;
 	}
 	

@@ -5,25 +5,58 @@ public class Account {
 	private long accountNumber;
 	private long userIDNumber;
 	private double balance;
-	//private AccountStatus status;
-	//private AccountType type;
+	private String type;
+	private String status = "pending";
 	
-	
-	
+
 	//Constructors
-	
+
 	public Account() {
 		
 	}
 	
-	public Account(long accountNumber){
-		this.accountNumber = accountNumber;
-		System.out.println("Account created! Account number is " + this.accountNumber);
+	public Account(long userIDNumber){
+		this.userIDNumber = userIDNumber;
+		System.out.println("Account created! Account number is " + this.userIDNumber);
 	}
+	
+	public Account(String type){
+		this.type = type;
+		System.out.println("Account created! Account number is " + this.userIDNumber);
+	}
+	
+	
 	
 	
 	//Getters and Setters
 	
+	public String getType() {
+		return type;
+	}
+	
+	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Account(long userIDNumber,
+			double balance, String type) {
+		super();
+		
+		this.userIDNumber = userIDNumber;
+		this.balance = balance;
+		this.type = type;
+	}
+
 	public long getUserIDNumber() {
 		System.out.println("User ID Number: " + userIDNumber);
 		return userIDNumber;
@@ -73,6 +106,16 @@ public class Account {
 			toAccount.deposit(amount);
 		}
 		else System.out.println("Insufficient funds");
+		
+	}
+
+	public void setAccountNumber(long accountNumber) {
+		this.accountNumber = accountNumber;
+		
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
 		
 	}	
 	

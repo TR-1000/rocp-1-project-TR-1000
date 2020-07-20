@@ -285,9 +285,11 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public boolean update(User user) {
 		try(Connection conn = ConnectionUtil.getConnection()){
-			String sql = "UPDATE customers SET  first_name=?, last_name=?, user_password, email=?, phone=?, WHERE id = ?;";
+			
+			String sql = "UPDATE customers SET  first_name=?, last_name=?, user_password=?, email=?, phone=? WHERE id = ?;";
 			
 			PreparedStatement statement = conn.prepareStatement(sql);
+			System.out.println(statement);
 			int index = 0;
 			
 			statement.setString(++index, user.getFirstName());
