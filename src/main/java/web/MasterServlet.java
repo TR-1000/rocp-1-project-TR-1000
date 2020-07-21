@@ -242,6 +242,7 @@ public class MasterServlet extends HttpServlet {
 					
 					} else {
 						Set<Account> allAccounts = accountDAO.selectAllAccounts();
+						System.out.println("fetching all accounts");
 						res.setStatus(200);
 						res.getWriter().println(om.writeValueAsString(allAccounts));
 					}

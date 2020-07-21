@@ -11,8 +11,15 @@ import models.Admin;
 import models.Employee;
 import models.User;
 import util.ConnectionUtil;
+import doa.AccountDAO;
+import doa.AccountDAOImpl;
+
+
+
 
 public class UserDAOImpl implements UserDAO {
+	
+	private static final AccountDAO accountDAO = new AccountDAOImpl();
 
 	@Override
 	public boolean insert(User user) {
@@ -87,15 +94,26 @@ public class UserDAOImpl implements UserDAO {
 			
 			ResultSet result = statement.executeQuery(sql);
 			
+			
+
+			
 			while(result.next()) {
-				customerSet.add(new User(result.getInt("id"), result.getString("first_name"),
-						result.getString("last_name"), result.getString("user_name"), 
-						result.getString("user_password"), result.getString("email"), 
-						result.getString("phone"))
-				);
+				User user = new User();
+				
+				user.setId(result.getInt("id"));
+				user.setFirstName(result.getString("first_name"));
+				user.setLastName(result.getString("last_name"));
+				user.setUserName(result.getString("user_name"));
+				user.setPassword(result.getString("user_password"));
+				user.setEmail(result.getString("email"));
+				user.setPhoneNumber(result.getString("phone"));
+				user.setAccounts(accountDAO.getsAccountsByUserID(result.getInt("id")));
+				customerSet.add(user);
+				
+				
 			}
 			
-			//List<User> list = new ArrayList<>(set);
+			
 			
 			return customerSet;
 			
@@ -234,6 +252,7 @@ public class UserDAOImpl implements UserDAO {
 				user.setPassword(result.getString("user_password"));
 				user.setEmail(result.getString("email"));
 				user.setPhoneNumber(result.getString("phone"));
+				user.setAccounts(accountDAO.getsAccountsByUserID(result.getInt("id")));
 				
 				return user;
 			}

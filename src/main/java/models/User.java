@@ -1,6 +1,8 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class User {
 	
@@ -12,7 +14,7 @@ public class User {
 	private String password;
 	private String email;
 	private String phoneNumber;
-	public ArrayList<Account> accounts = new ArrayList<Account>();
+	public Set<Account> accounts = new HashSet<>();
 	
 	
 	
@@ -82,11 +84,11 @@ public class User {
 	}
 
 
-	public void setAccounts(ArrayList<Account> accounts) {
-		this.accounts = accounts;
+	public void setAccounts(Set<Account> set) {
+		this.accounts = set;
 	}
 	
-	public ArrayList<Account> getAccounts() {
+	public Set<Account> getAccounts() {
 		return accounts;
 	}
 
