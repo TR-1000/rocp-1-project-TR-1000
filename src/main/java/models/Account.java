@@ -16,8 +16,7 @@ public class Account {
 	}
 	
 	
-	public Account(long accountNumber, long userIDNumber,
-			double balance, String type, String status) {
+	public Account(long accountNumber, long userIDNumber, double balance, String type, String status) {
 		super();
 		this.accountNumber = accountNumber;
 		this.userIDNumber = userIDNumber;
@@ -25,6 +24,7 @@ public class Account {
 		this.type = type;
 		this.status = status;
 	}
+	
 
 	public Account(long userIDNumber){
 		this.userIDNumber = userIDNumber;

@@ -20,8 +20,11 @@ import doa.AccountDAO;
 import doa.AccountDAOImpl;
 import models.Account;
 import models.Admin;
+import models.Deposit;
 import models.Employee;
+import models.Transfer;
 import models.User;
+import models.Withdrawal;
 
 
 
@@ -224,11 +227,16 @@ public class MasterServlet extends HttpServlet {
 						
 						// If customer is found in the database
 						} else {
-							if (accountDAO.addAccount(account)) {
+							if (accountDAO.openAccount(account)) {
 								res.setStatus(201);
-								res.getWriter().println("Account was created");
+								//res.getWriter().println("Account was created");
 								
-							} 
+								String json = om.writeValueAsString(accountDAO.getsAccountsByUserID((int) account.getUserIDNumber()));
+								res.getWriter().println(json);
+								
+								
+							}
+						
 						}
 						
 					
@@ -244,7 +252,7 @@ public class MasterServlet extends HttpServlet {
 					
 					
 			///////////////// UPDATE ACCOUNTS /////////////////
-			case "accountupdate" :
+			case "account_status_update" :
 				if (req.getMethod().equals("POST")) {
 					if (portions.length == 2) {
 						System.out.println("Updating account status");
@@ -294,6 +302,115 @@ public class MasterServlet extends HttpServlet {
 					}
 				}	
 					break;
+					
+			case("deposit"):
+				if (req.getMethod().equals("POST")) {
+					
+					BufferedReader reader = req.getReader();
+
+					StringBuilder string = new StringBuilder();
+
+					String line = reader.readLine();
+
+					while (line != null) {
+						string.append(line);
+						line = reader.readLine();
+					}
+
+					String body = new String(string);
+
+					System.out.println(body);
+					
+					Deposit depositObject = om.readValue(body, Deposit.class);
+					
+					System.out.println(depositObject);
+					
+					if(depositObject != null) {
+						accountDAO.deposit(depositObject.getAccount_number(), depositObject.getAmount());
+						System.out.println(body);
+						
+					}
+					res.setStatus(200);
+					String json = om.writeValueAsString(accountDAO.getAccountById(depositObject.getAccount_number()));
+					res.getWriter().println(json);
+				}
+				break;
+				
+			case("withdraw"):
+				if (req.getMethod().equals("POST")) {
+					
+					BufferedReader reader = req.getReader();
+
+					StringBuilder string = new StringBuilder();
+
+					String line = reader.readLine();
+
+					while (line != null) {
+						string.append(line);
+						line = reader.readLine();
+					}
+
+					String body = new String(string);
+
+					System.out.println(body);
+					
+					Withdrawal withdrawalObject = om.readValue(body, Withdrawal.class);
+					
+					System.out.println(withdrawalObject);
+					
+					if(withdrawalObject != null) {
+						accountDAO.withdraw(withdrawalObject.getAccount_number(), withdrawalObject.getAmount());
+						System.out.println(body);
+						
+					}
+					res.setStatus(200);
+					String json = om.writeValueAsString(accountDAO.getAccountById(withdrawalObject.getAccount_number()));
+					res.getWriter().println(json);
+				}
+				break;
+				
+				
+			case("transfer"):
+				if (req.getMethod().equals("POST")) {
+					
+					BufferedReader reader = req.getReader();
+
+					StringBuilder string = new StringBuilder();
+
+					String line = reader.readLine();
+
+					while (line != null) {
+						string.append(line);
+						line = reader.readLine();
+					}
+
+					String body = new String(string);
+
+					System.out.println(body);
+					
+					Transfer transferObject = om.readValue(body, Transfer.class);
+					
+					System.out.println(transferObject);
+					
+					int to = transferObject.getTo_account_number();
+					int from = transferObject.getFrom_account_number();
+					double amount = transferObject.getAmount();
+					
+					if(transferObject != null) {
+						System.out.println("transfer in progress");
+						accountDAO.transfer(to, from, amount);
+						System.out.println(body);
+						
+					}
+					res.setStatus(200);
+					String json = om.writeValueAsString(accountDAO.getTransferAccounts(to, from));
+					res.getWriter().println(json);
+				}
+				
+				
+				
+				
+				
 				
 				
 			}

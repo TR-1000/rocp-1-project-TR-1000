@@ -12,7 +12,7 @@ import util.ConnectionUtil;
 
 public class AccountDAOImpl implements AccountDAO {
 
-	public boolean addAccount(Account account) {
+	public boolean openAccount(Account account) {
 		System.out.println("In Inserting Account");
 		try(Connection conn = ConnectionUtil.getConnection()){
 			int index=0;
@@ -69,6 +69,9 @@ public class AccountDAOImpl implements AccountDAO {
 	}
 
 
+	
+	
+	
 
 	@Override
 	public Account getAccountById(int id) {
@@ -116,9 +119,11 @@ public class AccountDAOImpl implements AccountDAO {
 			
 			while(result.next()) {
 				accountSet.add(new Account(
+						result.getLong("account_number"),
 						result.getLong("customer_id"),
 						result.getDouble("balance"),
-						result.getString("type"))
+						result.getString("type"),
+						result.getString("status"))
 					);	
 			}
 			
@@ -128,6 +133,40 @@ public class AccountDAOImpl implements AccountDAO {
 		}
 		return null;
 	}
+	
+	
+	
+	public Set<Account> getTransferAccounts(int to, int from) {
+		
+		try(Connection conn = ConnectionUtil.getConnection()) {
+			
+			String sql = "SELECT * FROM accounts WHERE account_number = "+ from +" OR account_number = " + to + ";";
+			
+			Statement statement = conn.createStatement();
+			
+			Set<Account> accountSet = new HashSet<>();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			while(result.next()) {
+				accountSet.add(new Account(
+						result.getLong("account_number"),
+						result.getLong("customer_id"),
+						result.getDouble("balance"),
+						result.getString("type"),
+						result.getString("status"))
+					);	
+			}
+			
+			return accountSet;
+		}catch(SQLException e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	
+	
+	
 	
 	
 	@Override
@@ -157,8 +196,24 @@ public class AccountDAOImpl implements AccountDAO {
 
 
 	@Override
-	public boolean transfer(Account source, Account target, double amount) {
-		// TODO Auto-generated method stub
+	public boolean transfer(int toAccountNumber, int fromAccountNumber, double amount) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			String sql = "BEGIN; "
+					+ "UPDATE accounts SET balance = balance - " +amount+ " WHERE account_number = " +fromAccountNumber+"; "
+					+ "UPDATE accounts SET balance = balance + "+amount+" WHERE account_number = "+toAccountNumber+"; "
+					+ "COMMIT;";
+			
+			System.out.println(sql);
+			
+			PreparedStatement statement = conn.prepareStatement(sql);
+			
+			statement.execute();
+			return true;
+					
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -167,8 +222,20 @@ public class AccountDAOImpl implements AccountDAO {
 
 
 	@Override
-	public boolean deposit(Account account, double amount) {
-		// TODO Auto-generated method stub
+	public boolean deposit(int accountNumber, double amount) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			String sql = "UPDATE accounts SET balance = balance + " + amount + " WHERE account_number = " + accountNumber + ";";
+			System.out.println(sql);
+			
+			PreparedStatement statement = conn.prepareStatement(sql);
+			
+			statement.execute();
+			return true;
+					
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -177,8 +244,20 @@ public class AccountDAOImpl implements AccountDAO {
 
 
 	@Override
-	public boolean withdrawl(Account account, double amount) {
-		// TODO Auto-generated method stub
+	public boolean withdraw(int accountNumber, double amount) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			String sql = "UPDATE accounts SET balance = balance - " + amount + " WHERE account_number = " + accountNumber + ";";
+			System.out.println(sql);
+			
+			PreparedStatement statement = conn.prepareStatement(sql);
+			
+			statement.execute();
+			return true;
+					
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
