@@ -303,6 +303,10 @@ public class MasterServlet extends HttpServlet {
 				}	
 					break;
 					
+					
+					
+					
+			///////////////// DEPOSIT /////////////////
 			case("deposit"):
 				if (req.getMethod().equals("POST")) {
 					
@@ -336,6 +340,9 @@ public class MasterServlet extends HttpServlet {
 				}
 				break;
 				
+				
+				
+			///////////////// WITHDRAW /////////////////
 			case("withdraw"):
 				if (req.getMethod().equals("POST")) {
 					
@@ -358,18 +365,34 @@ public class MasterServlet extends HttpServlet {
 					
 					System.out.println(withdrawalObject);
 					
+					int accountNumber = withdrawalObject.getAccount_number();
+					
+					double balance = accountDAO.getAccountById(accountNumber).getBalance();
+					
+					double amount = withdrawalObject.getAmount();
+					
 					if(withdrawalObject != null) {
-						accountDAO.withdraw(withdrawalObject.getAccount_number(), withdrawalObject.getAmount());
-						System.out.println(body);
+						if(amount < balance ) {
+							accountDAO.withdraw(accountNumber, amount);
+							System.out.println(body);
+							res.setStatus(200);
+							String json = om.writeValueAsString(accountDAO.getAccountById(withdrawalObject.getAccount_number()));
+							res.getWriter().println(json);
+						} else {
+							res.getWriter().println("Insufficient funds!");
+							res.setStatus(404);
+						}
 						
 					}
-					res.setStatus(200);
-					String json = om.writeValueAsString(accountDAO.getAccountById(withdrawalObject.getAccount_number()));
-					res.getWriter().println(json);
+					
 				}
 				break;
 				
 				
+				
+				
+				
+			///////////////// TRANSFER /////////////////
 			case("transfer"):
 				if (req.getMethod().equals("POST")) {
 					
@@ -395,20 +418,25 @@ public class MasterServlet extends HttpServlet {
 					int to = transferObject.getTo_account_number();
 					int from = transferObject.getFrom_account_number();
 					double amount = transferObject.getAmount();
+					double balance = accountDAO.getAccountById(from).getBalance();
 					
 					if(transferObject != null) {
-						System.out.println("transfer in progress");
-						accountDAO.transfer(to, from, amount);
-						System.out.println(body);
+						if(amount < balance ) {
+							System.out.println("transfer in progress");
+							accountDAO.transfer(to, from, amount);
+							System.out.println(body);
+							res.setStatus(200);
+							String json = om.writeValueAsString(accountDAO.getTransferAccounts(to, from));
+							res.getWriter().println(json);
+						} else {
+							res.getWriter().println("Insufficient funds!");
+						}
 						
 					}
-					res.setStatus(200);
-					String json = om.writeValueAsString(accountDAO.getTransferAccounts(to, from));
-					res.getWriter().println(json);
+					
+					
+					
 				}
-				
-				
-				
 				
 				
 				
@@ -429,77 +457,8 @@ public class MasterServlet extends HttpServlet {
 
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// Lets us do POST requests in goGet
 		doGet(req, res);
-		
-//		res.setContentType("application/json");
-//		// this will set the default response to not found;
-//		// the request was successful
-//		res.setStatus(404);
-//				
-//		final String URI = req.getRequestURI().replace("/rocp-project/", "");
-//
-//		String[] portions = URI.split("/");
-//
-//		System.out.println(Arrays.toString(portions));
-//		
-//		try {
-//			switch (portions[0]) {
-			
-//				
-//			case "employees":
-//				if (portions.length == 2) {
-//					int user_id = Integer.parseInt(portions[1]);
-//					Set<Employee> emp = userController.findEmployeeByID(user_id);
-//					res.setStatus(200);
-//					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
-//					String json = om.writeValueAsString(emp);
-//					res.getWriter().println(json);
-//				} else {
-//					
-//					if (req.getMethod().equals("POST")) {
-//						
-//						BufferedReader reader = req.getReader();
-//
-//						StringBuilder string = new StringBuilder();
-//
-//						String line = reader.readLine();
-//
-//						while (line != null) {
-//							string.append(line);
-//							line = reader.readLine();
-//						}
-//
-//						String body = new String(string);
-//
-//						System.out.println(body);
-//						
-//						User user = om.readValue(body, User.class);
-//						
-//						System.out.println(user);
-//
-//						
-//					} else {
-//
-//						Set<User> all = userController.findAllEmployees();
-//						res.setStatus(200);
-//						res.getWriter().println(om.writeValueAsString(all));
-//					}
-//						
-//				}
-//			break;	
-//				
-//			case "admin":
-//				Set<Admin> all = userController.findAllAdmins();
-//				res.setStatus(200);
-//				res.getWriter().println(om.writeValueAsString(all));
-//				
-//			}
-//			
-//		} catch (NumberFormatException e) {
-//			e.printStackTrace();
-//			res.getWriter().println("The id you provided is not an integer");
-//			res.setStatus(400);
-//		}
 				
 	}
 	
