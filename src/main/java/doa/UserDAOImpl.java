@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import models.Admin;
 import models.Employee;
@@ -86,11 +87,11 @@ public class UserDAOImpl implements UserDAO {
 	public Set<User> findAllCustomers() {
 		System.out.println("Finding all users");
 		try(Connection conn = ConnectionUtil.getConnection()){
-			String sql = "SELECT * FROM customers;";
+			String sql = "SELECT * FROM customers ORDER BY id DESC;";
 			
 			Statement statement = conn.createStatement();
 			
-			Set<User> customerSet = new HashSet<>();
+			Set<User> customerSet = new LinkedHashSet<>();
 			
 			ResultSet result = statement.executeQuery(sql);
 			
@@ -129,11 +130,11 @@ public class UserDAOImpl implements UserDAO {
 	public Set<User> findAllEmployees() {
 		System.out.println("Finding all employees");
 		try(Connection conn = ConnectionUtil.getConnection()){
-			String sql = "SELECT * FROM employees;";
+			String sql = "SELECT * FROM employees ORDER BY id DESC;";
 			
 			Statement statement = conn.createStatement();
 			
-			Set<User> set = new HashSet<>();
+			Set<User> set = new LinkedHashSet<>();
 			
 			ResultSet result = statement.executeQuery(sql);
 			System.out.println(result);
@@ -166,11 +167,11 @@ public class UserDAOImpl implements UserDAO {
 	public Set<Admin> findAllAdmins() {
 		
 		try(Connection conn = ConnectionUtil.getConnection()){
-			String sql = "SELECT * FROM employees WHERE role = 'admin';";
+			String sql = "SELECT * FROM employees WHERE role = 'admin' ORDER BY id DESC;";
 			
 			Statement statement = conn.createStatement();
 			
-			Set<Admin> set = new HashSet<>();
+			Set<Admin> set = new LinkedHashSet<>();
 			
 			ResultSet result = statement.executeQuery(sql);
 			
@@ -271,11 +272,11 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public Set<User> findCustomerByName(String firstName, String lastName) {
 		try(Connection conn = ConnectionUtil.getConnection()){
-			String sql = "SELECT * FROM customers WHERE first_name = " + firstName + " AND last_name = " + lastName + " ;";
+			String sql = "SELECT * FROM customers WHERE first_name = " + firstName + " AND last_name = " + lastName + " ORDER BY id DESC ;";
 			
 			Statement statement = conn.createStatement();
 			
-			Set<User> set = new HashSet<>();
+			Set<User> set = new LinkedHashSet<>();
 			
 			ResultSet result = statement.executeQuery(sql);
 			
