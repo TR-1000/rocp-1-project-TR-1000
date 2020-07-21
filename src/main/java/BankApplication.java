@@ -74,10 +74,10 @@ public class BankApplication {
 //		emp.createAccount(90);
 		
 		
-		Account ca1 = user1.accounts.get(0);
-		Account sa1 = user1.accounts.get(1);
-		System.out.println(ca1.getType());
-		System.out.println(sa1.getType());
+//		Account ca1 = user1.accounts.get(0);
+//		Account sa1 = user1.accounts.get(1);
+//		System.out.println(ca1.getType());
+//		System.out.println(sa1.getType());
 		
 //		accountDAO.insert(ca1);
 //		accountDAO.insert(sa1);
