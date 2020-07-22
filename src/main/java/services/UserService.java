@@ -14,7 +14,6 @@ public class UserService {
 	private final UserDAO userDAO = new UserDAOImpl();
 	
 	public Set<User> findAllCustomers() {
-		System.out.println("User service in action");
 		return userDAO.findAllCustomers();
 	}
 	
@@ -42,6 +41,11 @@ public class UserService {
 	public boolean update(User user) {
 		return userDAO.update(user);
 	}
+	
+//	public User login(String username, String password) {
+//		return userDAO.login(username, password);
+//	}
+
 
 	
 	

@@ -2,19 +2,25 @@ package web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+import controllers.LoginController;
 import controllers.UserController;
 import doa.AccountDAO;
 import doa.AccountDAOImpl;
@@ -22,9 +28,15 @@ import models.Account;
 import models.Admin;
 import models.Deposit;
 import models.Employee;
+import models.Login;
 import models.Transfer;
 import models.User;
 import models.Withdrawal;
+
+
+import java.util.Date;
+
+import java.util.concurrent.TimeUnit;
 
 
 
@@ -32,7 +44,10 @@ public class MasterServlet extends HttpServlet {
 	
 	private static final ObjectMapper om = new ObjectMapper();
 	private static final UserController userController = new UserController();
+	private static final LoginController loginController = new LoginController();
 	private static final AccountDAO accountDAO = new AccountDAOImpl();
+	
+	
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -49,22 +64,132 @@ public class MasterServlet extends HttpServlet {
 		String[] portions = URI.split("/");
 
 		System.out.println(Arrays.toString(portions));
-
+		
 		try {
-			System.out.println("try");
+			HttpSession session = req.getSession(false);
 			switch (portions[0]) {
 			
 			
+			
+			
+			///////////////// LOGIN /////////////////
+			case "customer_login":
+					
+				loginController.customer_login(req, res);
+				
+				break;
+				
+			case "logout":
+				
+				if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
+					
+					loginController.logout(req, res);
+					
+				} else {
+					
+					res.getWriter().println("Can't log out if you were never logged in");
+				}
+				
+			
+				break;
+				
+				
+				
+				
+				
+			///////////////// REGISTER /////////////////	
+			case "register":
+				
+				if (req.getMethod().equals("POST")) {
+				
+					BufferedReader reader = req.getReader();
+
+					StringBuilder string = new StringBuilder();
+
+					String line = reader.readLine();
+
+					while (line != null) {
+						string.append(line);
+						line = reader.readLine();
+					}
+
+					String body = new String(string);
+
+					System.out.println(body);
+				
+					User user = om.readValue(body, User.class);
+				
+					System.out.println(user);
+
+					if (userController.insert(user)) {
+						res.setStatus(201);
+						res.getWriter().println("User was created");
+						
+					} else {
+						
+						res.getWriter().println("Mistakes were made");
+						
+					}
+			
+				
+			} else {
+				
+				res.getWriter().println("Something went wrong");
+
+//				Set<User> all = userController.findAllCustomers();
+//				res.setStatus(200);
+//				res.getWriter().println(om.writeValueAsString(all));
+			}
+			
+			break;
+				
+				
+				
+				
 			///////////////// USERS /////////////////
-			case "users":
+			case "customer":
+				
+//				HttpSession session = req.getSession(false);
+//				if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
+//					System.out.println("user role: " + session.getAttribute("role"));
+//					System.out.println("user id: " + session.getAttribute("user_id"));
+//					System.out.println("user id: " + session.getAttribute("loggedin"));
+//						
+//				
+//				} else {
+//					res.getWriter().println("You must be logged in to do that!");
+//				}
+				
+				
+				// NEEDS TO BE GET
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
-					User user = userController.findCustomerByID(id);
-					res.setStatus(200);
-					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
-					String json = om.writeValueAsString(user);
-					res.getWriter().println(json);
+					//HttpSession session = req.getSession(false);
+					if (session != null && ((Boolean) session.getAttribute("loggedin")) && session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin")) {
+						System.out.println("user role: " + session.getAttribute("role"));
+						System.out.println("user id: " + session.getAttribute("user_id"));
+						System.out.println("user id: " + session.getAttribute("loggedin"));
+						
+						User user = userController.findCustomerByID(id);
+						res.setStatus(200);
+						// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
+						String json = om.writeValueAsString(user);
+						res.getWriter().println(json);
+							
+					
+					} else {
+						res.setStatus(401);
+						res.getWriter().println("Denied!");
+					}
+					
+					
+					
+					
+					
 				} else {
+					
+					
+					//REGISTER
 					if (req.getMethod().equals("POST")) {
 						System.out.println("POST method");
 						BufferedReader reader = req.getReader();
@@ -94,18 +219,17 @@ public class MasterServlet extends HttpServlet {
 						
 					} else {
 
-						Set<User> all = userController.findAllCustomers();
-						res.setStatus(200);
-						res.getWriter().println(om.writeValueAsString(all));
+//						Set<User> all = userController.findAllCustomers();
+//						res.setStatus(200);
+//						res.getWriter().println(om.writeValueAsString(all));
 					}
-						
 				}
 				break;
 				
 				
 				
             ///////////////// UPDATE USERS /////////////////
-			case "UpdateUser":
+			case "update_user":
 				if (req.getMethod().equals("POST")) {
 				System.out.println("Updating user");
 				if (portions.length == 2) {
@@ -462,6 +586,54 @@ public class MasterServlet extends HttpServlet {
 		doGet(req, res);
 				
 	}
+	
+//	if (req.getMethod().equals("POST")) {
+//	
+//	BufferedReader reader = req.getReader();
+//
+//	StringBuilder string = new StringBuilder();
+//
+//	String line = reader.readLine();
+//
+//	while (line != null) {
+//		string.append(line);
+//		line = reader.readLine();
+//	}
+//
+//	String body = new String(string);
+//	
+//	Login log = om.readValue(body, Login.class);
+//	
+//	User user = userController.login(log.getUsername() , log.getPassword());
+//	
+//	
+//	
+//	
+//	if (user != null) {
+//		jwtStr = Jwts.builder().setSubject(
+//				user.getUserName())
+//					.setExpiration(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(120)))
+//					.claim("id", user.getId())
+//					.claim("role", user.getRole())
+//					.signWith(key)
+//					.compact();
+//		res.setStatus(200);
+//		res.getWriter().println(jwtStr);
+//		
+//		res.getWriter().println(Jwts.parserBuilder()
+//					.require("role", "admin")
+//					.setSigningKey(key).build().parseClaimsJws(jwtStr));
+//				
+//	} else {
+//		res.setStatus(401);
+//		res.getWriter().println("Incorrect username or password");
+//	}
+//
+//	
+//} else {
+//
+//	res.getWriter().println("please log in");
+//}
 	
 }
 		

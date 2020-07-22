@@ -40,6 +40,10 @@ public class UserController {
 		return userService.update(user);
 	}
 	
+//	public User login(String username, String password) {
+//		return userService.login(username, password);
+//	}
+	
 	
 
 }

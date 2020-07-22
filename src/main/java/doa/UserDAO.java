@@ -16,6 +16,7 @@ public interface UserDAO {
 	public User findCustomerByID(int id);
 	public Set<Employee> findEmployeeByID(int id);
 	public Set<User> findCustomerByName(String firstName, String lastName);
+	public User login(String username, String password);
 	
 	
 

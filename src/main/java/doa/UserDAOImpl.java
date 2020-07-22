@@ -299,8 +299,6 @@ public class UserDAOImpl implements UserDAO {
 	
 	
 	
-	
-	
 	@Override
 	public boolean update(User user) {
 		try(Connection conn = ConnectionUtil.getConnection()){
@@ -325,6 +323,37 @@ public class UserDAOImpl implements UserDAO {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	
+	
+	
+	public User login(String username, String password) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			String sql = "SELECT * FROM customers WHERE user_name = 'fred' AND user_password = 'nightmare';";
+			
+			Statement statement = conn.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			if (result.next()) {
+				User user = new User();
+				user.setId(result.getInt("id"));
+				user.setFirstName(result.getString("first_name"));
+				user.setLastName(result.getString("last_name"));
+				user.setUserName(result.getString("user_name"));
+				user.setPassword(result.getString("user_password"));
+				user.setEmail(result.getString("email"));
+				user.setPhoneNumber(result.getString("phone"));
+				user.setAccounts(accountDAO.getsAccountsByUserID(result.getInt("id")));
+				
+				return user;
+			}
+			
+		}catch(SQLException e) {
+			System.out.println(e);
+		} 
+		return null;
 	}
 	
 	
