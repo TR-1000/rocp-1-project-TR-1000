@@ -31,8 +31,9 @@ public class Account {
 		System.out.println("Account created! Account number is " + this.userIDNumber);
 	}
 	
-	public Account(String type){
+	public Account(long userIDNumber, String type){
 		this.type = type;
+		this.userIDNumber = userIDNumber;
 		System.out.println("Account created! Account number is " + this.userIDNumber);
 	}
 	

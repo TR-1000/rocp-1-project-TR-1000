@@ -19,5 +19,4 @@ public interface AccountDAO {
 	public boolean updateAccountStatus(Account account);
 	public Object getTransferAccounts(int to, int from);
 	
-	
 }

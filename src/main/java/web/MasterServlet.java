@@ -35,9 +35,7 @@ import models.Withdrawal;
 
 
 import java.util.Date;
-
 import java.util.concurrent.TimeUnit;
-
 
 
 public class MasterServlet extends HttpServlet {
@@ -72,9 +70,9 @@ public class MasterServlet extends HttpServlet {
 			
 			
 			
-			///////////////// LOGIN /////////////////
+			///////////////// LOGIN LOGOUT /////////////////
 			case "customer_login":
-					
+			
 				loginController.customer_login(req, res);
 				
 				break;
@@ -90,10 +88,7 @@ public class MasterServlet extends HttpServlet {
 					res.getWriter().println("Can't log out if you were never logged in");
 				}
 				
-			
 				break;
-				
-				
 				
 				
 				
@@ -148,20 +143,7 @@ public class MasterServlet extends HttpServlet {
 				
 			///////////////// USERS /////////////////
 			case "customer":
-				
-//				HttpSession session = req.getSession(false);
-//				if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
-//					System.out.println("user role: " + session.getAttribute("role"));
-//					System.out.println("user id: " + session.getAttribute("user_id"));
-//					System.out.println("user id: " + session.getAttribute("loggedin"));
-//						
-//				
-//				} else {
-//					res.getWriter().println("You must be logged in to do that!");
-//				}
-				
-				
-				// NEEDS TO BE GET
+				// NEEDS TO BE GET REQUEST
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
 					//HttpSession session = req.getSession(false);
@@ -176,22 +158,39 @@ public class MasterServlet extends HttpServlet {
 						String json = om.writeValueAsString(user);
 						res.getWriter().println(json);
 							
-					
 					} else {
+						
 						res.setStatus(401);
 						res.getWriter().println("Denied!");
 					}
 					
-					
-					
-					
-					
 				} else {
 					
+					Set<User> all = userController.findAllCustomers();
+					res.setStatus(200);
+					res.getWriter().println(om.writeValueAsString(all));
 					
-					//REGISTER
-					if (req.getMethod().equals("POST")) {
-						System.out.println("POST method");
+				}
+				
+				break;
+				
+				
+				
+				
+            ///////////////// UPDATE USERS /////////////////
+			case "customer_update":
+				if (req.getMethod().equals("POST")) {
+					
+				System.out.println("Updating user");
+				
+				if (portions.length == 2) {
+					
+					int id = Integer.parseInt(portions[1]);
+					
+					if (session != null && ((Boolean) session.getAttribute("loggedin")) && session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin")) {
+						
+						User foundUser = userController.findCustomerByID(id);
+						
 						BufferedReader reader = req.getReader();
 
 						StringBuilder string = new StringBuilder();
@@ -210,79 +209,48 @@ public class MasterServlet extends HttpServlet {
 						User user = om.readValue(body, User.class);
 						
 						System.out.println(user);
+						
+						if(user != null) {
+							foundUser.setFirstName(user.getFirstName());
+							foundUser.setLastName(user.getLastName());
+							foundUser.setPassword(user.getPassword());
+							foundUser.setEmail(user.getEmail());
+							foundUser.setPhoneNumber(user.getPhoneNumber());
+							foundUser.setId(id);
 
-						if (userController.insert(user)) {
-							res.setStatus(201);
-							res.getWriter().println("User was created");
+							System.out.println("before " + foundUser);
+							
+							userController.update(foundUser);
+							
+							System.out.println("after " + foundUser);
+							
+							foundUser = userController.findCustomerByID(id);
+						
+							System.out.println(body);
+							
 						}
-					
-						
+						res.setStatus(200);
+						String json = om.writeValueAsString(foundUser);
+						res.getWriter().println(json);
+							
 					} else {
-
-//						Set<User> all = userController.findAllCustomers();
-//						res.setStatus(200);
-//						res.getWriter().println(om.writeValueAsString(all));
+						
+						res.setStatus(401);
+						res.getWriter().println("Denied!");
+						
 					}
 				}
-				break;
-				
-				
-				
-            ///////////////// UPDATE USERS /////////////////
-			case "update_user":
-				if (req.getMethod().equals("POST")) {
-				System.out.println("Updating user");
-				if (portions.length == 2) {
-					int id = Integer.parseInt(portions[1]);
-					User foundUser = userController.findCustomerByID(id);
 					
-					BufferedReader reader = req.getReader();
-
-					StringBuilder string = new StringBuilder();
-
-					String line = reader.readLine();
-
-					while (line != null) {
-						string.append(line);
-						line = reader.readLine();
-					}
-
-					String body = new String(string);
-
-					System.out.println(body);
+				} else {
 					
-					User user = om.readValue(body, User.class);
-					
-					System.out.println(user);
-					
-					if(user != null) {
-						foundUser.setFirstName(user.getFirstName());
-						foundUser.setLastName(user.getLastName());
-						foundUser.setPassword(user.getPassword());
-						foundUser.setEmail(user.getEmail());
-						foundUser.setPhoneNumber(user.getPhoneNumber());
-						foundUser.setId(id);
-
-						System.out.println("before " + foundUser);
-						
-						userController.update(foundUser);
-						
-						System.out.println("after " + foundUser);
-						
-						foundUser = userController.findCustomerByID(id);
-					
-						System.out.println(body);
-						
-					}
-					res.setStatus(200);
-					String json = om.writeValueAsString(foundUser);
-					res.getWriter().println(json);
-						
+					res.getWriter().println("Mistakes were made");
 				}
-			}	
+				
 				break;
 			
 			
+				
+				
 			///////////////// EMPLOYEES /////////////////
 			case "employees":
 				if (portions.length == 2) {
@@ -301,6 +269,8 @@ public class MasterServlet extends HttpServlet {
 				
 				
 				
+				
+				
 			///////////////// ADMIN /////////////////
 			case "admin":
 				Set<Admin> all = userController.findAllAdmins();
@@ -310,18 +280,50 @@ public class MasterServlet extends HttpServlet {
 				
 				
 				
+				
 			///////////////// ACCOUNTS /////////////////
-			case "accounts":
+			case "account":
+				
 				if (portions.length == 2) {
+					
 					int id = Integer.parseInt(portions[1]);
-					Account account = accountDAO.getAccountById(id);
-					res.setStatus(200);
-					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
-					String json = om.writeValueAsString(account);
-					res.getWriter().println(json);
+					
+					if (session != null && ((Boolean) session.getAttribute("loggedin")) && session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin")) {
+						
+						Account account = accountDAO.getAccountById(id);
+						
+						res.setStatus(200);
+						
+						String json = om.writeValueAsString(account);
+						
+						res.getWriter().println(json);
+					
+					} else {
+						
+						res.setStatus(401);
+						res.getWriter().println("Denied");
+					}
+					
+					
+					
 				} else {
+			
+					
+				}
+				
+				break;
+				
+				
+				
+				
+				
+			///////////////// NEW ACCOUNT /////////////////
+			case "account_new":
+				
+				if (session != null && ((Boolean) session.getAttribute("loggedin")) || session.getAttribute("role").equals("admin")) {
+					
 					if (req.getMethod().equals("POST")) {
-						System.out.println("POST Method");
+						
 						BufferedReader reader = req.getReader();
 
 						StringBuilder string = new StringBuilder();
@@ -337,48 +339,82 @@ public class MasterServlet extends HttpServlet {
 
 						System.out.println(body);
 						
-						Account account = om.readValue(body, Account.class);
+						Account new_account = om.readValue(body, Account.class);
 						
-						System.out.println(account);
+						int customer_id = (int) session.getAttribute("user_id");
 						
-						int customer_id = (int) account.getUserIDNumber();
+						new_account.setUserIDNumber(customer_id);
 						
-						User foundUser = userController.findCustomerByID(customer_id);
-						// If customer is not found in the database
-						if(foundUser == null) {
-							res.setStatus(404);
-							res.getWriter().println("customer ID number " + customer_id + " doesn't exist");
-						
-						// If customer is found in the database
+						if (accountDAO.openAccount(new_account)) {
+							System.out.println("asdasdasdads");
+							res.setStatus(201);
+							//res.getWriter().println("Account was created");
+							
+							String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+							res.getWriter().println(json);
+							
 						} else {
-							if (accountDAO.openAccount(account)) {
-								res.setStatus(201);
-								//res.getWriter().println("Account was created");
-								
-								String json = om.writeValueAsString(accountDAO.getsAccountsByUserID((int) account.getUserIDNumber()));
-								res.getWriter().println(json);
-								
-								
-							}
-						
+							
+							res.getWriter().println("Mistakes were made");
+							
 						}
 						
-					
+//						int customer_id = (int) new_account.getUserIDNumber();
+//						System.out.println("asdasdasdads");
+//						
+//						if(session.getAttribute("user_id").equals(customer_id)) {
+//							
+//							System.out.println("asdasdasdads");
+//							User foundUser = userController.findCustomerByID(customer_id);
+//							// If customer is not found in the database
+//							if(foundUser == null) {
+//								res.setStatus(404);
+//								res.getWriter().println("customer ID number " + customer_id + " doesn't exist");
+//							
+//							// If customer is found in the database
+//							} else {
+//								System.out.println("asdasdasdads");
+//								if (accountDAO.openAccount(((long)customer_id), new_account.getType())) {
+//									System.out.println("asdasdasdads");
+//									res.setStatus(201);
+//									//res.getWriter().println("Account was created");
+//									
+//									String json = om.writeValueAsString(accountDAO.getsAccountsByUserID((int) new_account.getUserIDNumber()));
+//									res.getWriter().println(json);
+//									
+//								} else {
+//									
+//									res.getWriter().println("Mistakes were made");
+//									
+//								}
+//							
+//							}
+//							
+//						} else {
+//							res.getWriter().println("Mistakes were made");
+//						}
+						
 					} else {
-						Set<Account> allAccounts = accountDAO.selectAllAccounts();
-						System.out.println("fetching all accounts");
-						res.setStatus(200);
-						res.getWriter().println(om.writeValueAsString(allAccounts));
+						
+						res.getWriter().println("Something went wrong");
+//						Set<Account> allAccounts = accountDAO.selectAllAccounts();
+//						System.out.println("fetching all accounts");
+//						res.setStatus(200);
+//						res.getWriter().println(om.writeValueAsString(allAccounts));
+						
 					}
-					
 				}
-					break;
-					
+				
+				
+				
+				
 					
 					
 			///////////////// UPDATE ACCOUNTS /////////////////
 			case "account_status_update" :
-				if (req.getMethod().equals("POST")) {
+				
+				if (session.getAttribute("role").equals("admin")) {
+					
 					if (portions.length == 2) {
 						System.out.println("Updating account status");
 						int id = Integer.parseInt(portions[1]);
@@ -425,7 +461,9 @@ public class MasterServlet extends HttpServlet {
 						res.getWriter().println(json);
 							
 					}
-				}	
+				} else {
+					res.getWriter().println("Access DENIED!");
+				}
 					break;
 					
 					
@@ -469,6 +507,7 @@ public class MasterServlet extends HttpServlet {
 				
 			///////////////// WITHDRAW /////////////////
 			case("withdraw"):
+				
 				if (req.getMethod().equals("POST")) {
 					
 					BufferedReader reader = req.getReader();
@@ -634,6 +673,19 @@ public class MasterServlet extends HttpServlet {
 //
 //	res.getWriter().println("please log in");
 //}
+	
+	
+//	HttpSession session = req.getSession(false);
+//	if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
+//		System.out.println("user role: " + session.getAttribute("role"));
+//		System.out.println("user id: " + session.getAttribute("user_id"));
+//		System.out.println("user id: " + session.getAttribute("loggedin"));
+//			
+//	
+//	} else {
+//		res.getWriter().println("You must be logged in to do that!");
+//	}
+
 	
 }
 		

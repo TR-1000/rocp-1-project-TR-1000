@@ -12,7 +12,7 @@ public class SavingsAccount extends Account {
 
 	
 	public SavingsAccount(String type) {
-		super(type);
+		super();
 		// TODO Auto-generated constructor stub
 	}
 	

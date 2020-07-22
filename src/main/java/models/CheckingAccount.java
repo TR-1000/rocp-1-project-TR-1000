@@ -15,7 +15,7 @@ public class CheckingAccount extends Account {
 	}
 
 	public CheckingAccount(String type) {
-		super(type);
+		super();
 		// TODO Auto-generated constructor stub
 	}
 
