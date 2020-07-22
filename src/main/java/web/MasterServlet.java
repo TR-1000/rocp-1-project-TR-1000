@@ -462,6 +462,7 @@ public class MasterServlet extends HttpServlet {
 							
 					}
 				} else {
+					res.setStatus(401);
 					res.getWriter().println("Access DENIED!");
 				}
 					break;
@@ -493,13 +494,51 @@ public class MasterServlet extends HttpServlet {
 					System.out.println(depositObject);
 					
 					if(depositObject != null) {
-						accountDAO.deposit(depositObject.getAccount_number(), depositObject.getAmount());
-						System.out.println(body);
 						
+						if (session != null && ((Boolean) session.getAttribute("loggedin")) || session.getAttribute("role").equals("admin")) {
+							
+							int customer_id = (int) session.getAttribute("user_id");
+							
+							Account foundAccount = accountDAO.getAccountById(depositObject.getAccount_number());
+							
+							if(foundAccount != null) {
+								
+								int foundAccountCustomer = (int) foundAccount.getUserIDNumber();
+								
+								if (customer_id == foundAccountCustomer) {
+									
+									accountDAO.deposit(depositObject.getAccount_number(), depositObject.getAmount());
+															
+									String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+									
+									res.getWriter().println(json);
+									
+								} else {
+									
+									res.setStatus(401);
+									
+									res.getWriter().println("Incorrect Account Number");
+									
+									String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+									
+									res.getWriter().println(json);
+								}
+								
+							} else {
+								
+								res.setStatus(404);
+								
+								res.getWriter().println("Account Doesn't Exist");
+								
+								String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+								
+								res.getWriter().println(json);
+								
+							}
+						}
+							
 					}
-					res.setStatus(200);
-					String json = om.writeValueAsString(accountDAO.getAccountById(depositObject.getAccount_number()));
-					res.getWriter().println(json);
+				
 				}
 				break;
 				
@@ -550,6 +589,7 @@ public class MasterServlet extends HttpServlet {
 					}
 					
 				}
+			
 				break;
 				
 				
@@ -598,13 +638,8 @@ public class MasterServlet extends HttpServlet {
 						
 					}
 					
-					
-					
 				}
-				
-				
-				
-				
+					
 			}
 			
 		} catch (NumberFormatException e) {
