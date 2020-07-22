@@ -153,10 +153,10 @@ public class MasterServlet extends HttpServlet {
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
 					//HttpSession session = req.getSession(false);
-					if (session != null && ((Boolean) session.getAttribute("loggedin")) && session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin")) {
-						System.out.println("user role: " + session.getAttribute("role"));
-						System.out.println("user id: " + session.getAttribute("user_id"));
-						System.out.println("user id: " + session.getAttribute("loggedin"));
+					if (session != null && ((Boolean) session.getAttribute("loggedin")) 
+							&& (session.getAttribute("user_id").equals(id) 
+							|| session.getAttribute("role").equals("admin"))) {
+						
 						
 						User user = userController.findCustomerByID(id);
 						res.setStatus(200);
@@ -205,7 +205,9 @@ public class MasterServlet extends HttpServlet {
 					
 					int id = Integer.parseInt(portions[1]);
 					System.out.println("role" + session.getAttribute("role"));
-					if (session != null && ((Boolean) session.getAttribute("loggedin")) && (session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin"))) {
+					if (session != null && ((Boolean) session.getAttribute("loggedin")) 
+							&& (session.getAttribute("user_id").equals(id) 
+							|| session.getAttribute("role").equals("admin"))) {
 						
 						User foundUser = userController.findCustomerByID(id);
 						
@@ -338,7 +340,7 @@ public class MasterServlet extends HttpServlet {
 			///////////////// NEW ACCOUNT /////////////////
 			case "account_new":
 				
-				if (session != null && ((Boolean) session.getAttribute("loggedin")) || session.getAttribute("role").equals("admin")) {
+				if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
 					
 					if (req.getMethod().equals("POST")) {
 						
@@ -364,7 +366,7 @@ public class MasterServlet extends HttpServlet {
 						new_account.setUserIDNumber(customer_id);
 						
 						if (accountDAO.openAccount(new_account)) {
-							System.out.println("asdasdasdads");
+							
 							res.setStatus(201);
 							//res.getWriter().println("Account was created");
 							
