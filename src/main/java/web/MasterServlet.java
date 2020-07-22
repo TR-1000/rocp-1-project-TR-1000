@@ -147,7 +147,7 @@ public class MasterServlet extends HttpServlet {
 				
 				
 				
-			///////////////// USERS /////////////////
+			///////////////// CUSTOMERS /////////////////
 			case "customer":
 				// NEEDS TO BE GET REQUEST
 				if (portions.length == 2) {
@@ -172,9 +172,21 @@ public class MasterServlet extends HttpServlet {
 					
 				} else {
 					
-					Set<User> all = userController.findAllCustomers();
-					res.setStatus(200);
-					res.getWriter().println(om.writeValueAsString(all));
+					if ( session != null ) {
+						if (session.getAttribute("role").equals("admin") || session.getAttribute("role").equals("admin")) {
+							Set<User> all = userController.findAllCustomers();
+							res.setStatus(200);
+							res.getWriter().println(om.writeValueAsString(all));
+						}
+
+						Set<User> all = userController.findAllCustomers();
+						res.setStatus(200);
+						res.getWriter().println(om.writeValueAsString(all));
+					
+					} else {
+						res.setStatus(401);
+						res.getWriter().println(om.writeValueAsString("Access Denied!"));
+					}
 					
 				}
 				
@@ -183,7 +195,7 @@ public class MasterServlet extends HttpServlet {
 				
 				
 				
-            ///////////////// UPDATE USERS /////////////////
+            ///////////////// UPDATE CUSTOMER INFO /////////////////
 			case "customer_update":
 				if (req.getMethod().equals("POST")) {
 					
@@ -192,8 +204,8 @@ public class MasterServlet extends HttpServlet {
 				if (portions.length == 2) {
 					
 					int id = Integer.parseInt(portions[1]);
-					
-					if (session != null && ((Boolean) session.getAttribute("loggedin")) && session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin")) {
+					System.out.println("role" + session.getAttribute("role"));
+					if (session != null && ((Boolean) session.getAttribute("loggedin")) && (session.getAttribute("user_id").equals(id) || session.getAttribute("role").equals("admin"))) {
 						
 						User foundUser = userController.findCustomerByID(id);
 						

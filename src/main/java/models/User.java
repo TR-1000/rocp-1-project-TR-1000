@@ -147,6 +147,13 @@ public class User {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+	
+	public void setRole(String role) {
+		this.role = role;
+		
+	}
+	
+
 
 
 	@Override
@@ -171,6 +178,8 @@ public class User {
 		result = prime * result + ((userName == null) ? 0 : userName.hashCode());
 		return result;
 	}
+
+	
 
 	
 	
