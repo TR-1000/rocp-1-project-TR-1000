@@ -40,4 +40,33 @@ public class LoginDAOImpl implements LoginDAO {
 		} 
 		return null;
 	}
+
+	@Override
+	public User employee_login(String username, String password) {
+		System.out.println("EMPLOYEE LOG IN");
+		try(Connection conn = ConnectionUtil.getConnection()){
+			String sql = "SELECT * FROM employees WHERE user_name = '"+ username +"' AND user_password = '" + password + "';";
+			System.out.println(sql);
+			
+			Statement statement = conn.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			if (result.next()) {
+				User user = new User();
+				user.setId(result.getInt("id"));
+				user.setFirstName(result.getString("first_name"));
+				user.setLastName(result.getString("last_name"));
+				user.setUserName(result.getString("user_name"));
+				user.setPassword(result.getString("user_password"));
+				user.setEmail(result.getString("email"));
+				user.setPhoneNumber(result.getString("phone"));
+				return user;
+			}
+			
+		}catch(SQLException e) {
+			System.out.println(e);
+		} 
+		return null;
+	}
 }

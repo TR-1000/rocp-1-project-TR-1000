@@ -77,6 +77,12 @@ public class MasterServlet extends HttpServlet {
 				
 				break;
 				
+			case "employee_login":
+				
+				loginController.employee_login(req, res);
+				
+				break;	
+				
 			case "logout":
 				
 				if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
@@ -711,7 +717,7 @@ public class MasterServlet extends HttpServlet {
 									
 									res.setStatus(401);
 									
-									res.getWriter().println("Access Denied");
+									res.getWriter().println("Access Denied!");
 									
 									String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
 									
@@ -790,8 +796,6 @@ public class MasterServlet extends HttpServlet {
 		
 		
 
-
-
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		// Lets us do POST requests in goGet
 		doGet(req, res);
@@ -845,19 +849,6 @@ public class MasterServlet extends HttpServlet {
 //
 //	res.getWriter().println("please log in");
 //}
-	
-	
-//	HttpSession session = req.getSession(false);
-//	if (session != null && ((Boolean) session.getAttribute("loggedin"))) {
-//		System.out.println("user role: " + session.getAttribute("role"));
-//		System.out.println("user id: " + session.getAttribute("user_id"));
-//		System.out.println("user id: " + session.getAttribute("loggedin"));
-//			
-//	
-//	} else {
-//		res.getWriter().println("You must be logged in to do that!");
-//	}
-
 	
 }
 		

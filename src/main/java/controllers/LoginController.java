@@ -73,16 +73,74 @@ public class LoginController {
 	
 	}
 	
+	public void employee_login(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		if(req.getMethod().equals("POST")) {
+			System.out.println("LOGIN CONTROLLER");
+			
+			BufferedReader reader = req.getReader();
+			
+			StringBuilder s = new StringBuilder();
+			
+			String line = reader.readLine();
+			
+			while(line != null) {
+				s.append(line);
+				line=reader.readLine();
+			}
+			
+			String body = new String(s);
+			
+			System.out.println(body);
+			
+			Login log = om.readValue(body, Login.class);
+			
+			User foundUser = loginService.employee_login(log.getUsername(), log.getPassword());
+			
+			
+			if (foundUser != null) {
+				String role = foundUser.getRole();
+				int user_id = (int) foundUser.getId();
+				System.out.println(user_id);
+	
+				HttpSession session = req.getSession();
+				session.setAttribute("user", foundUser);
+				session.setAttribute("role", role);
+				session.setAttribute("user_id", user_id);
+				session.setAttribute("loggedin", true);
+				res.setStatus(200);
+				String json = om.writeValueAsString(foundUser);
+				res.getWriter().println("Login Successful");
+				res.getWriter().println(json);
+				
+			} else {
+				HttpSession session = req.getSession(false);
+				if(session != null) {
+					session.invalidate();
+				}
+				res.setStatus(401);
+				res.getWriter().println("Invalid Username or Password");
+				
+			}
+			
+		} else {
+			res.getWriter().println("Something went wrong");
+		}
+	
+	}
+	
+	
+	
 	public void logout(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		HttpSession session = req.getSession(false);
 		
 		if(session != null) {
 			
 			User currentUser = (User) session.getAttribute("user");
+			System.out.println(currentUser);
 			
 			session.invalidate();
 			res.setStatus(200);
-			res.getWriter().println("Goodbye, " + currentUser.getUserName());
+			res.getWriter().println("Goodbye, " + currentUser.getFirstName());
 		} else {
 			res.setStatus(400);
 			res.getWriter().println("You must be logged in to log out.");
