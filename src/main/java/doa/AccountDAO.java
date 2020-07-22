@@ -11,7 +11,7 @@ public interface AccountDAO {
 //	public Account findByAccountNumber(long accountNumber);
 //	public Account findByUserIDNumber(long userIDNumber);
 	public Set<Account> selectAllAccounts();
-	public Set<Account> getsAccountsByUserID(int id);
+	public Set<Account> getAccountsByUserID(int id);
 	public Account getAccountById(int id);
 	public boolean transfer(int toAccountNumber, int fromAccountNumber, double amount);
 	public boolean deposit(int accountNumber, double amount);

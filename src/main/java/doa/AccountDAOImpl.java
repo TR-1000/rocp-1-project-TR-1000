@@ -105,7 +105,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 
 	@Override
-	public Set<Account> getsAccountsByUserID(int id) {
+	public Set<Account> getAccountsByUserID(int id) {
 		System.out.println("Finding all accounts");
 		try(Connection conn = ConnectionUtil.getConnection()) {
 			

@@ -30,7 +30,7 @@ public class LoginDAOImpl implements LoginDAO {
 				user.setPassword(result.getString("user_password"));
 				user.setEmail(result.getString("email"));
 				user.setPhoneNumber(result.getString("phone"));
-				user.setAccounts(accountDAO.getsAccountsByUserID(result.getInt("id")));
+				user.setAccounts(accountDAO.getAccountsByUserID(result.getInt("id")));
 				
 				return user;
 			}

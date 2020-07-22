@@ -568,26 +568,70 @@ public class MasterServlet extends HttpServlet {
 					
 					System.out.println(withdrawalObject);
 					
-					int accountNumber = withdrawalObject.getAccount_number();
-					
-					double balance = accountDAO.getAccountById(accountNumber).getBalance();
-					
-					double amount = withdrawalObject.getAmount();
-					
 					if(withdrawalObject != null) {
-						if(amount < balance ) {
-							accountDAO.withdraw(accountNumber, amount);
-							System.out.println(body);
-							res.setStatus(200);
-							String json = om.writeValueAsString(accountDAO.getAccountById(withdrawalObject.getAccount_number()));
-							res.getWriter().println(json);
-						} else {
-							res.getWriter().println("Insufficient funds!");
-							res.setStatus(404);
-						}
 						
+						if (session != null && ((Boolean) session.getAttribute("loggedin")) || session.getAttribute("role").equals("admin")) {
+							
+							int customer_id = (int) session.getAttribute("user_id");
+							
+							Account foundAccount = accountDAO.getAccountById(withdrawalObject.getAccount_number());
+							
+							if(foundAccount != null) {
+								
+								int foundAccountCustomer = (int) foundAccount.getUserIDNumber();
+								
+								if (customer_id == foundAccountCustomer) {
+									
+									double balance = foundAccount.getBalance();
+									
+									double amount = withdrawalObject.getAmount();
+									
+									if(amount <= balance ) {
+										
+										accountDAO.withdraw(withdrawalObject.getAccount_number(), withdrawalObject.getAmount());
+										
+										String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+										
+										res.getWriter().println(json);
+										
+									} else {
+										
+										res.setStatus(400);
+										
+										res.getWriter().println("Insufficient funds!");
+										
+										String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+										
+										res.getWriter().println(json);
+										
+									}
+									
+								} else {
+									
+									res.setStatus(401);
+									
+									res.getWriter().println("Incorrect Account Number");
+									
+									String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+									
+									res.getWriter().println(json);
+								}
+								
+							} else {
+								
+								res.setStatus(404);
+								
+								res.getWriter().println("Account Doesn't Exist");
+								
+								String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+								
+								res.getWriter().println(json);
+								
+							}
+						}
+							
 					}
-					
+				
 				}
 			
 				break;
@@ -598,6 +642,99 @@ public class MasterServlet extends HttpServlet {
 				
 			///////////////// TRANSFER /////////////////
 			case("transfer"):
+				
+				if (req.getMethod().equals("POST")) {
+					
+					BufferedReader reader = req.getReader();
+
+					StringBuilder string = new StringBuilder();
+
+					String line = reader.readLine();
+
+					while (line != null) {
+						string.append(line);
+						line = reader.readLine();
+					}
+
+					String body = new String(string);
+
+					System.out.println(body);
+					
+					Transfer transferObject = om.readValue(body, Transfer.class);
+					
+					System.out.println(transferObject);
+					
+					if(transferObject != null) {
+						
+						if (session != null && ((Boolean) session.getAttribute("loggedin")) || session.getAttribute("role").equals("admin")) {
+							
+							int customer_id = (int) session.getAttribute("user_id");
+							
+							int to = transferObject.getTo_account_number();
+							Account foundToAccount = accountDAO.getAccountById(to);
+							
+							int from = transferObject.getFrom_account_number();
+							Account foundFromAccount = accountDAO.getAccountById(from);
+							
+			
+							if(foundFromAccount != null && foundToAccount != null) {
+							
+								int foundAccountCustomer = (int) foundFromAccount.getUserIDNumber();
+								
+								if (customer_id == foundAccountCustomer) {
+									
+									double amount = transferObject.getAmount();
+									
+									double balance = foundToAccount.getBalance();
+									
+									if(amount <= balance ) {
+										
+										accountDAO.transfer(to, from, amount);
+										
+										String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+										
+										res.getWriter().println(json);
+										
+									} else {
+										
+										res.setStatus(400);
+										
+										res.getWriter().println("Insufficient funds!");
+										
+										String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+										
+										res.getWriter().println(json);
+										
+									}
+									
+								} else {
+									
+									res.setStatus(401);
+									
+									res.getWriter().println("Access Denied");
+									
+									String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+									
+									res.getWriter().println(json);
+								}
+								
+							} else {
+								
+								res.setStatus(404);
+								
+								res.getWriter().println("One Of These Accounts Doesn't Exist");
+								
+								String json = om.writeValueAsString(userController.findCustomerByID(customer_id));
+								
+								res.getWriter().println(json);
+								
+							}
+						}
+							
+					}
+				
+				}
+			
 				if (req.getMethod().equals("POST")) {
 					
 					BufferedReader reader = req.getReader();
