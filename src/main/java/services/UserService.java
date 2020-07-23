@@ -42,9 +42,9 @@ public class UserService {
 		return userDAO.update(user);
 	}
 	
-//	public User login(String username, String password) {
-//		return userDAO.login(username, password);
-//	}
+	public User findCustomerByEmail(String email) {
+		return userDAO.findCustomerByEmail(email);
+	}
 
 
 	

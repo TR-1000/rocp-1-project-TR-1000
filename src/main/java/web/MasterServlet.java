@@ -117,25 +117,36 @@ public class MasterServlet extends HttpServlet {
 					String body = new String(string);
 
 					System.out.println(body);
-				
-					User user = om.readValue(body, User.class);
-				
-					System.out.println(user);
-
-					if (userController.insert(user)) {
-						res.setStatus(201);
-						res.getWriter().println("User was created");
+					
+					try {
 						
-					} else {
+						User user = om.readValue(body, User.class);
+						if (userController.insert(user)) {
+							res.setStatus(201);
+							res.getWriter().println("Registration Successful!");
+							String json = om.writeValueAsString(userController.findCustomerByEmail(user.getEmail()));
+							res.getWriter().println(json);
+							
+						} else {
+							
+							res.getWriter().println("Mistakes Were Made");
+							
+						}
 						
-						res.getWriter().println("Mistakes were made");
+					} catch (Exception e) {
+						
+						res.getWriter().println("Mistakes Were Made");
 						
 					}
+				
+					
+				
+					
 			
 				
 			} else {
 				
-				res.getWriter().println("Something went wrong");
+				res.getWriter().println("Something Went Wrong");
 
 //				Set<User> all = userController.findAllCustomers();
 //				res.setStatus(200);
@@ -167,7 +178,7 @@ public class MasterServlet extends HttpServlet {
 					} else {
 						
 						res.setStatus(401);
-						res.getWriter().println("Denied!");
+						res.getWriter().println("Access Denied!");
 					}
 					
 				} else {
@@ -204,7 +215,9 @@ public class MasterServlet extends HttpServlet {
 				if (portions.length == 2) {
 					
 					int id = Integer.parseInt(portions[1]);
-					System.out.println("role" + session.getAttribute("role"));
+					
+					
+					
 					if (session != null && ((Boolean) session.getAttribute("loggedin")) 
 							&& (session.getAttribute("user_id").equals(id) 
 							|| session.getAttribute("role").equals("admin"))) {
@@ -250,20 +263,21 @@ public class MasterServlet extends HttpServlet {
 							
 						}
 						res.setStatus(200);
+						res.getWriter().println("Update Successful!");
 						String json = om.writeValueAsString(foundUser);
 						res.getWriter().println(json);
 							
 					} else {
 						
 						res.setStatus(401);
-						res.getWriter().println("Denied!");
+						res.getWriter().println("Access Denied!");
 						
 					}
 				}
 					
 				} else {
 					
-					res.getWriter().println("Mistakes were made");
+					res.getWriter().println("Mistakes Were Made");
 				}
 				
 				break;
@@ -272,7 +286,7 @@ public class MasterServlet extends HttpServlet {
 				
 				
 			///////////////// EMPLOYEES /////////////////
-			case "employees":
+			case "employee":
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
 					Set<Employee> emp = userController.findEmployeeByID(id);
@@ -280,11 +294,27 @@ public class MasterServlet extends HttpServlet {
 					// The ObjectMapper (om) here will take the object (a) and convert it to a JSON object String.
 					String json = om.writeValueAsString(emp);
 					res.getWriter().println(json);
+					
 				} else {
-					Set<User> all = userController.findAllEmployees();
-					res.setStatus(200);
-					res.getWriter().println(om.writeValueAsString(all));
+					
+					if ( session != null ) {
+						if (session.getAttribute("role").equals("admin") || session.getAttribute("role").equals("admin")) {
+							Set<User> all = userController.findAllCustomers();
+							res.setStatus(200);
+							res.getWriter().println(om.writeValueAsString(all));
+						}
+
+						Set<User> all = userController.findAllEmployees();
+						res.setStatus(200);
+						res.getWriter().println(om.writeValueAsString(all));
+					
+					} else {
+						res.setStatus(401);
+						res.getWriter().println(om.writeValueAsString("Access Denied!"));
+					}
+					
 				}
+				
 				break;	
 				
 				
@@ -303,7 +333,7 @@ public class MasterServlet extends HttpServlet {
 				
 			///////////////// ACCOUNTS /////////////////
 			case "account":
-				
+				System.out.println("ACOUNT!!!!!!!!!!!!");
 				if (portions.length == 2) {
 					
 					int id = Integer.parseInt(portions[1]);
@@ -321,19 +351,35 @@ public class MasterServlet extends HttpServlet {
 					} else {
 						
 						res.setStatus(401);
-						res.getWriter().println("Denied");
+						res.getWriter().println("Access Denied!");
 					}
 					
 					
 					
 				} else {
-			
 					
+					if ( session != null ) {
+						if (session.getAttribute("role").equals("admin") || session.getAttribute("role").equals("admin")) {
+							Set<Account> allAccounts = accountDAO.selectAllAccounts();
+							res.setStatus(200);
+							res.getWriter().println(om.writeValueAsString(allAccounts));
+							
+						} else {
+							
+							res.setStatus(401);
+							res.getWriter().println(om.writeValueAsString("Access Denied!"));
+						}
+		
+				} else {
+					
+					res.setStatus(401);
+					res.getWriter().println(om.writeValueAsString("Access Denied!"));
 				}
-				
+					
+			}		
 				break;
 				
-				
+			
 				
 				
 				
@@ -375,54 +421,17 @@ public class MasterServlet extends HttpServlet {
 							
 						} else {
 							
-							res.getWriter().println("Mistakes were made");
+							res.getWriter().println("Mistakes Were Made");
 							
 						}
-						
-//						int customer_id = (int) new_account.getUserIDNumber();
-//						System.out.println("asdasdasdads");
-//						
-//						if(session.getAttribute("user_id").equals(customer_id)) {
-//							
-//							System.out.println("asdasdasdads");
-//							User foundUser = userController.findCustomerByID(customer_id);
-//							// If customer is not found in the database
-//							if(foundUser == null) {
-//								res.setStatus(404);
-//								res.getWriter().println("customer ID number " + customer_id + " doesn't exist");
-//							
-//							// If customer is found in the database
-//							} else {
-//								System.out.println("asdasdasdads");
-//								if (accountDAO.openAccount(((long)customer_id), new_account.getType())) {
-//									System.out.println("asdasdasdads");
-//									res.setStatus(201);
-//									//res.getWriter().println("Account was created");
-//									
-//									String json = om.writeValueAsString(accountDAO.getsAccountsByUserID((int) new_account.getUserIDNumber()));
-//									res.getWriter().println(json);
-//									
-//								} else {
-//									
-//									res.getWriter().println("Mistakes were made");
-//									
-//								}
-//							
-//							}
-//							
-//						} else {
-//							res.getWriter().println("Mistakes were made");
-//						}
 						
 					} else {
 						
 						res.getWriter().println("Something went wrong");
-//						Set<Account> allAccounts = accountDAO.selectAllAccounts();
-//						System.out.println("fetching all accounts");
-//						res.setStatus(200);
-//						res.getWriter().println(om.writeValueAsString(allAccounts));
 						
 					}
+				} else {
+					res.getWriter().println("Please Log In");
 				}
 				
 				
