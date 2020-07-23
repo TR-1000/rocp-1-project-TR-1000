@@ -9,18 +9,27 @@ import models.User;
 import util.ConnectionUtil;
 
 public class LoginDAOImpl implements LoginDAO {
-	
+
 	private static final AccountDAO accountDAO = new AccountDAOImpl();
-	
+
+
+
+
+
+
+	// ==================================================
+	// ///////////////// CUSTOMER LOGIN /////////////////
+	// ==================================================
+	@Override
 	public User customer_login(String username, String password) {
 		try(Connection conn = ConnectionUtil.getConnection()){
 			String sql = "SELECT * FROM customers WHERE user_name = '"+ username +"' AND user_password = '" + password + "';";
 			System.out.println(sql);
-			
+
 			Statement statement = conn.createStatement();
-			
+
 			ResultSet result = statement.executeQuery(sql);
-			
+
 			if (result.next()) {
 				User user = new User();
 				user.setId(result.getInt("id"));
@@ -31,27 +40,33 @@ public class LoginDAOImpl implements LoginDAO {
 				user.setEmail(result.getString("email"));
 				user.setPhoneNumber(result.getString("phone"));
 				user.setAccounts(accountDAO.getAccountsByUserID(result.getInt("id")));
-				
+
 				return user;
 			}
-			
+
 		}catch(SQLException e) {
 			System.out.println(e);
-		} 
+		}
 		return null;
 	}
 
+
+
+
+	// ==================================================
+	// ///////////////// EMPLOYEE LOGIN /////////////////
+	// ==================================================
 	@Override
 	public User employee_login(String username, String password) {
 		System.out.println("EMPLOYEE LOG IN");
 		try(Connection conn = ConnectionUtil.getConnection()){
 			String sql = "SELECT * FROM employees WHERE user_name = '"+ username +"' AND user_password = '" + password + "';";
 			System.out.println(sql);
-			
+
 			Statement statement = conn.createStatement();
-			
+
 			ResultSet result = statement.executeQuery(sql);
-			
+
 			if (result.next()) {
 				User user = new User();
 				user.setId(result.getInt("id"));
@@ -64,10 +79,10 @@ public class LoginDAOImpl implements LoginDAO {
 				user.setPhoneNumber(result.getString("phone"));
 				return user;
 			}
-			
+
 		}catch(SQLException e) {
 			System.out.println(e);
-		} 
+		}
 		return null;
 	}
 }
