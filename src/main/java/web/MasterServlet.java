@@ -300,6 +300,7 @@ public class MasterServlet extends HttpServlet {
 
 			case "employee":
 				if (portions.length == 2) {
+					
 					int id = Integer.parseInt(portions[1]);
 					Set<Employee> emp = userController.findEmployeeByID(id);
 					res.setStatus(200);
@@ -310,15 +311,14 @@ public class MasterServlet extends HttpServlet {
 				} else {
 
 					if ( session != null ) {
-						if (session.getAttribute("role").equals("admin") || session.getAttribute("role").equals("admin")) {
+						if (session.getAttribute("role").equals("admin") || session.getAttribute("role").equals("employee")) {
 							Set<User> all = userController.findAllCustomers();
 							res.setStatus(200);
 							res.getWriter().println(om.writeValueAsString(all));
 						}
 
-						Set<User> all = userController.findAllEmployees();
-						res.setStatus(200);
-						res.getWriter().println(om.writeValueAsString(all));
+						res.setStatus(401);
+						res.getWriter().println(om.writeValueAsString("Access Denied!"));
 
 					} else {
 						res.setStatus(401);
@@ -339,10 +339,23 @@ public class MasterServlet extends HttpServlet {
 // =========================================
 
 			case "admin":
-				Set<Admin> all = userController.findAllAdmins();
-				res.setStatus(200);
-				res.getWriter().println(om.writeValueAsString(all));
+				
+				if ( session != null ) {
+					if (session.getAttribute("role").equals("admin") || session.getAttribute("role").equals("employee")) {
+						Set<Admin> all = userController.findAllAdmins();
+						res.setStatus(200);
+						res.getWriter().println(om.writeValueAsString(all));
+						break;
+					} else {
+
+						res.setStatus(401);
+						res.getWriter().println(om.writeValueAsString("Access Denied!"));
+					}
+				}	
+				
 				break;
+
+				
 
 
 
