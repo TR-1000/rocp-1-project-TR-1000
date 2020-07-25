@@ -131,9 +131,6 @@ public class LoginController {
 				System.out.println("1st KEY: " + getKey());
 				
 				
-				
-				//res.setStatus(200);
-				//res.getWriter().println(jwtStr);
 				System.out.println(jwtStr);
 				
 				String role = foundUser.getRole();
