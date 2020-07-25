@@ -14,7 +14,7 @@ public class User {
 	private String password;
 	private String email;
 	private String phoneNumber;
-	public Set<Account> accounts = new HashSet<>();
+	private Set<Account> accounts = new HashSet<>();
 	
 	
 	

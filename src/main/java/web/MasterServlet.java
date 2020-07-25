@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -28,14 +26,9 @@ import models.Account;
 import models.Admin;
 import models.Deposit;
 import models.Employee;
-import models.Login;
 import models.Transfer;
 import models.User;
 import models.Withdrawal;
-
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 
 public class MasterServlet extends HttpServlet {
@@ -44,7 +37,7 @@ public class MasterServlet extends HttpServlet {
 	private static final UserController userController = new UserController();
 	private static final LoginController loginController = new LoginController();
 	private static final AccountDAO accountDAO = new AccountDAOImpl();
-
+	//private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
 
 	@Override
@@ -161,7 +154,20 @@ public class MasterServlet extends HttpServlet {
 // =============================================
 
 			case "customer":
-				// NEEDS TO BE GET REQUEST
+				System.out.println("2nd KEY: " + loginController.getKey());
+				String[] auth = req.getHeader("Authorization").split(" ");
+				String jwtStr = auth[1];
+				System.out.println(jwtStr);
+				
+				res.getWriter().println(Jwts.parserBuilder()
+						.require("role", "admin")
+						.setSigningKey(loginController.getKey())
+						.build()
+							.parseClaimsJws(jwtStr));
+				
+//				res.getWriter().println(Jwts.parserBuilder()
+//				.require("role", "admin")
+//				.setSigningKey(key).build().parseClaimsJws(jwtStr));
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
 
@@ -193,17 +199,15 @@ public class MasterServlet extends HttpServlet {
 							Set<User> all = userController.findAllCustomers();
 							res.setStatus(200);
 							res.getWriter().println(om.writeValueAsString(all));
+							
+						} else {
+							res.setStatus(401);
+							res.getWriter().println(om.writeValueAsString("Access Denied!"));
 						}
 
-						res.setStatus(401);
-						res.getWriter().println(om.writeValueAsString("Access Denied!"));
-
-					} else {
-						res.setStatus(401);
-						res.getWriter().println(om.writeValueAsString("Access Denied!"));
 					}
-
-				}
+					
+				}	
 
 				break;
 

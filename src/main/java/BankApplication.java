@@ -68,9 +68,9 @@ public class BankApplication {
 //		
 //		
 //		
-		user1.createCheckingAccount();
+//		user1.createCheckingAccount();
 //		admin1.createAccount(34);
-		user1.createSavingsAccount();
+//		user1.createSavingsAccount();
 //		emp.createAccount(90);
 		
 		

@@ -49,7 +49,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 	@Override
 	public Set<Account> selectAllAccounts() {
-		System.out.println("Finding all accounts");
+		
 		try(Connection conn = ConnectionUtil.getConnection()) {
 			String sql = "SELECT * FROM accounts;";
 
@@ -120,7 +120,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 	@Override
 	public Set<Account> getAccountsByUserID(int id) {
-		System.out.println("Finding all accounts");
+		
 		try(Connection conn = ConnectionUtil.getConnection()) {
 
 			String sql = "SELECT * FROM accounts WHERE customer_id = " + id + ";";
