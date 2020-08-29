@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class User {
-	private enum Role {STANDARD, EMPLOYEE, ADMIN}
 	
 	private long id;
 	private String role = "standard";

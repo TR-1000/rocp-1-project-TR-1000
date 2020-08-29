@@ -2,7 +2,6 @@ package models;
 
 public class Account {
 
-	private enum Type {CHECKING, SAVINGS}
 	private long accountNumber;
 	private long userIDNumber;
 	private double balance;

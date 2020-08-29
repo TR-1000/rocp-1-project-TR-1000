@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.Set;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -161,7 +165,9 @@ public class MasterServlet extends HttpServlet {
 						.build()
 							.parseClaimsJws(jwtStr));
 				
-
+//				res.getWriter().println(Jwts.parserBuilder()
+//				.require("role", "admin")
+//				.setSigningKey(key).build().parseClaimsJws(jwtStr));
 				if (portions.length == 2) {
 					int id = Integer.parseInt(portions[1]);
 
